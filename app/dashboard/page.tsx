@@ -5,7 +5,7 @@ import { auth } from "../../firebase";
 import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
+import AnimatedLink from "@/components/ui/AnimatedLink";
 
 interface Pack {
   id: string;
@@ -144,7 +144,7 @@ export default function Dashboard() {
     <div>
       {user && (
         <div
-          className="flex justify-between items-center bg-amber-100 px-8 py-4 rounded-b-xl"
+          className="flex justify-between items-center bg-amber-100 px-8 py-4 rounded-br-3xl"
           id="navbar"
         >
           <div className="flex justify-center items-center gap-2">
@@ -153,9 +153,8 @@ export default function Dashboard() {
               onClick={() => setOpen(!open)}
             />
             {open && (
-              <div className="absolute top-16 left-0 w-full bg-black text-white flex flex-col items-center gap-4 p-5 md:hidden">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/Profile">Profile</a>
+              <div className="absolute top-16 left-0 w-auto bg-amber-100 text-black rounded-br-3xl flex flex-col items-center gap-4 p-5">
+                <a href="/profile">Profile</a>
               </div>
             )}
             <h1 className="text-2xl font-bold font-serif ">₹ Dhanify ₹</h1>
@@ -225,14 +224,14 @@ export default function Dashboard() {
           {packs.map((pack) => (
             <div
               key={pack.id}
-              className="border rounded-lg p-4 shadow-md bg-white"
+              className="border-solid rounded-lg p-4 shadow-md bg-white hover:shadow-xl transition-shadow duration-300"
             >
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold">{pack.name}</h2>
                 {pack.risk === "low" ? (
-                  <div className="rounded-full bg-green-500 w-6 h-6"/>
-                ):(
-                  <div className="rounded-full bg-red-700 w-6 h-6"/>
+                  <div className="rounded-full bg-green-500 w-6 h-6" />
+                ) : (
+                  <div className="rounded-full bg-red-700 w-6 h-6" />
                 )}
               </div>
               <p>Amount: ₹{pack.amount}</p>
@@ -241,11 +240,13 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600 mt-2">{pack.description}</p>
               <button
                 onClick={() => handleInvestment(pack.id)}
-                className="mt-4 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg cursor-grab"
+                className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-grab transition duration-300 ease-in-out"
               >
                 Invest Now
               </button>
-              <Link href="/" className="hover:text-blue-500 hover:underline ml-2">Read more</Link>
+              <AnimatedLink href={`/package/${pack.id}`}>
+                <h2 className="text-xl font-semibold">Read More</h2>
+              </AnimatedLink>
             </div>
           ))}
         </div>
