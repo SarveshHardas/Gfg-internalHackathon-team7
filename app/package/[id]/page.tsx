@@ -11,7 +11,6 @@ export default function PackagePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     console.log("Package ID from URL:", id);
 
     const fetchPack = async () => {
@@ -40,26 +39,28 @@ export default function PackagePage() {
   }
 
   return (
-    <div className="p-10 max-w-xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">{pack.name}</h1>
-      <h1 className="mb-4">💸 Amount: ₹{pack.amount}</h1>
-      <h1 className="mb-4">📈 APY: {pack.apy}%</h1>
-      <h1 className="mb-4 flex justify-start items-center gap-2">
-        {pack.risk === "low" ? (
-          <div className="rounded-full bg-green-500 w-4 h-4" />
-        ) : (
-          <div className="rounded-full bg-red-700 w-4 h-4" />
-        )}{" "}
-        Risk: {pack.risk}
-      </h1>
-      <h1 className="text-gray-600 mb-2">Description: {pack.description}</h1>
+    <div className="p-10 flex flex-col justify-center items-center gap-7 min-h-screen">
+      <div className="border-2 border-black p-14 rounded-3xl">
+        <h1 className="text-3xl font-bold mb-4">{pack.name}</h1>
+        <h1 className="mb-4">💸 Amount: ₹{pack.amount}</h1>
+        <h1 className="mb-4">📈 APY: {pack.apy}%</h1>
+        <h1 className="mb-4 flex justify-start items-center gap-2">
+          {pack.risk === "low" ? (
+            <div className="rounded-full bg-green-500 w-4 h-4" />
+          ) : (
+            <div className="rounded-full bg-red-700 w-4 h-4" />
+          )}{" "}
+          Risk: {pack.risk}
+        </h1>
+        <h1 className="text-gray-600 mb-2">Description: {pack.description}</h1>
 
-      <button
-        onClick={() => router.push("/dashboard")}
-        className="bg-amber-500 text-white px-4 py-2 rounded"
-      >
-        Back to Dashboard
-      </button>
+        <div className="flex justify-center items-center mt-10"><button
+          onClick={() => router.push("/dashboard")}
+          className="bg-amber-500 text-white px-4 py-2 rounded"
+        >
+          Back to Dashboard
+        </button></div>
+      </div>
     </div>
   );
 }
