@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { auth } from "../../../firebase";
+import ThreeDPieChart from "@/components/ThreeDPieChart";
 
 export default function PackagePage() {
   const { id } = useParams();
@@ -9,9 +11,14 @@ export default function PackagePage() {
 
   const [pack, setPack] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [userInvestment, setUserInvestment] = useState<number>(0);
 
   useEffect(() => {
-    console.log("Package ID from URL:", id);
+    const unsubs = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
 
     const fetchPack = async () => {
       try {
@@ -29,7 +36,84 @@ export default function PackagePage() {
     };
 
     fetchPack();
+
+    return () => unsubs();
   }, [id]);
+
+  useEffect(() => {
+    if (!user || !id) {
+      return;
+    }
+    const fetchUserPackInvestment = async () => {
+      const res = await fetch("/api/user/pack-investment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.uid, packId: id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUserInvestment(data.totalInvested);
+      }
+    };
+
+    fetchUserPackInvestment();
+  }, [user, id]);
+
+  const handleInvestment = async (packId: string) => {
+    // for handling investment
+    try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert("User not logged in.");
+        return;
+      }
+
+      const res = await fetch("/api/investment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          packId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert(
+          `Investment successful!\nYou invested: ₹${data.investedAmount}\nExpected Return: ₹${data.expectedReturn}`
+        );
+
+        const res = await fetch("/api/user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: user.uid }),
+        });
+
+        const updatedData = await res.json();
+        if (updatedData.success) {
+          setStats(updatedData.user);
+        }
+      } else {
+        alert("Investment failed!!" + data.message);
+      }
+    } catch (err: any) {
+      console.error("Investment error:", err);
+      alert("Something went wrong while investing.");
+    }
+  };
+
+  const chartData =
+    pack?.Splits &&
+    Object.entries(pack.Splits).map(([Key, value]) => ({
+      name: Key,
+      value: value as number,
+    }));
 
   if (loading) {
     return <div className="p-10">Loading package...</div>;
@@ -53,13 +137,44 @@ export default function PackagePage() {
           Risk: {pack.risk}
         </h1>
         <h1 className="text-gray-600 mb-2">Description: {pack.description}</h1>
+        <div className="mt-4 p-4 rounded-lg bg-green-100 font-semibold">
+          You have invested ₹{userInvestment} in this plan
+        </div>
+        {chartData && (
+          <div className="mt-10 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Investment Split
+            </h2>
+            <ThreeDPieChart data={chartData} totalInvestment={userInvestment} />
+            <div className="mt-6 space-y-2">
+              {chartData.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex justify-between border-b pb-1"
+                >
+                  <span className="capitalize">{item.name}</span>
+                  <span className="font-semibold">{item.value}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className="flex justify-center items-center mt-10"><button
-          onClick={() => router.push("/dashboard")}
-          className="bg-amber-500 text-white px-4 py-2 rounded"
+        <button
+          onClick={() => handleInvestment(pack.id)}
+          className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-grab transition duration-300 ease-in-out"
         >
-          Back to Dashboard
-        </button></div>
+          Invest Now
+        </button>
+
+        <div className="flex justify-center items-center mt-10">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="bg-amber-500 text-white px-4 py-2 rounded"
+          >
+            Back to Dashboard
+          </button>
+        </div>
       </div>
     </div>
   );

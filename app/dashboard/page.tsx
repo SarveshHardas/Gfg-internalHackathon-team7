@@ -5,7 +5,7 @@ import { auth } from "../../firebase";
 import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import AnimatedLink from "@/components/ui/AnimatedLink";
+import AnimatedLink from "@/components/AnimatedLink";
 
 interface Pack {
   id: string;
