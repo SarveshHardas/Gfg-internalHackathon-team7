@@ -5,6 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import { auth } from "../../../firebase";
 import ThreeDPieChart from "@/components/ThreeDPieChart";
 
+type ChartItem = {
+  name: string;
+  value: number;
+};
+
+
 export default function PackagePage() {
   const { id } = useParams();
   const router = useRouter();
@@ -108,7 +114,7 @@ export default function PackagePage() {
     }
   };
 
-  const chartData =
+  const chartData: ChartItem[] =
     pack?.Splits &&
     Object.entries(pack.Splits).map(([Key, value]) => ({
       name: Key,
@@ -147,7 +153,7 @@ export default function PackagePage() {
             </h2>
             <ThreeDPieChart data={chartData} totalInvestment={userInvestment} />
             <div className="mt-6 space-y-2">
-              {chartData.map((item) => (
+              {chartData.map((item:ChartItem) => (
                 <div
                   key={item.name}
                   className="flex justify-between border-b pb-1"
