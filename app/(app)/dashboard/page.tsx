@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "../../firebase";
+import { auth } from "../../../firebase";
 import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import Image from "next/image";
 import AnimatedLink from "@/components/AnimatedLink";
+import Loading from "@/components/Loading";
 
 interface Pack {
   id: string;
@@ -88,7 +90,7 @@ export default function Dashboard() {
 
   // Show loading state while fetching packs
   if (loading) {
-    return <div className="p-10">Loading Investment packages...</div>;
+    return <Loading/>
   }
 
   const handleInvestment = async (packId: string) => {
@@ -97,7 +99,7 @@ export default function Dashboard() {
       const user = auth.currentUser;
 
       if (!user) {
-        alert("User not logged in.");
+        toast.error("User not logged in.");
         return;
       }
 
@@ -115,7 +117,7 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (data.success) {
-        alert(
+        toast.success(
           `Investment successful!\nYou invested: ₹${data.investedAmount}\nExpected Return: ₹${data.expectedReturn}`
         );
 
@@ -132,11 +134,11 @@ export default function Dashboard() {
           setStats(updatedData.user);
         }
       } else {
-        alert("Investment failed!!" + data.message);
+        toast.error("Investment failed!!" + data.message);
       }
     } catch (err: any) {
       console.error("Investment error:", err);
-      alert("Something went wrong while investing.");
+      toast.error("Something went wrong while investing.");
     }
   };
 
@@ -251,6 +253,7 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+     
     </div>
   );
 }

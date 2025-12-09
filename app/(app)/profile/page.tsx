@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "../../firebase";
+import { auth } from "../../../firebase";
 import Image from "next/image";
 
 const Profile = () => {
@@ -43,7 +43,7 @@ const Profile = () => {
   console.log(userInvestment);
 
   return (
-    <div className="p-10">
+    <div className="p-10 min-h-screen">
       {user && (
         <div className="max-w-7xl mx-auto space-y-5">
           <div className="flex justify-start items-center gap-5">

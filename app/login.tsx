@@ -7,12 +7,12 @@ import {auth, provider} from "../firebase";
 import {signInWithPopup} from "firebase/auth";
 import {doc, setDoc, getDoc} from "firebase/firestore";
 import {db} from "../firebase";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
     const router = useRouter();
     
     const handleLogin = async (e?:React.MouseEvent) => {
-        // alert("Redirecting to Google OAuth...");
         e?.preventDefault();
 
         try{
@@ -38,8 +38,7 @@ const LoginPage = () => {
 
             router.push("/dashboard");
         }catch(error: any){
-            console.log("Login error:", error);
-            alert("Login failed: "+ error.message);
+            toast.error("Login failed: "+ error.message);
         }
     }
 
