@@ -13,7 +13,7 @@ export default function BottomNavbar() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full h-16 bg-amber-500 z-50 flex justify-around items-center rounded-t-4xl">
+    <div className="fixed bottom-0 left-0 w-full h-16 bg-amber-500 z-50 flex justify-around items-center rounded-t-4xl mt-5">
       {navItems.map((item) => {
         const isActive = pathname === item.path;
 
