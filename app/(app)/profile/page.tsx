@@ -59,7 +59,7 @@ const Profile = () => {
             />
             <p className="text-2xl font-semibold">{user.email}</p>
           </div>
-          <div className="border-2 border-gray-500 p-10 rounded-2xl space-y-6 mt-20">
+          <div className="z-50 shadow-2xl p-10 rounded-2xl space-y-6 mt-20">
             <p>
               <span className="font-semibold">Name:</span> {user.name}
             </p>

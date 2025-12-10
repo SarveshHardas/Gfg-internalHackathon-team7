@@ -6,6 +6,7 @@ import { auth } from "../../../firebase";
 import ThreeDPieChart from "@/components/ThreeDPieChart";
 import toast from "react-hot-toast";
 import Loading from "@/components/Loading";
+import { fireConfetti } from "@/app/lib/confetti";
 
 export default function PackagePage() {
   const { id } = useParams();
@@ -88,6 +89,8 @@ export default function PackagePage() {
         toast.success(
           `Investment successful!\nYou invested: ₹${data.investedAmount}\nExpected Return: ₹${data.expectedReturn}`
         );
+
+        fireConfetti();
 
         const res = await fetch("/api/user", {
           method: "POST",
