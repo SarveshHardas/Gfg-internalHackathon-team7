@@ -171,13 +171,13 @@ export default function PackagePage() {
         <div className="flex justify-center items-center mt-10 gap-10">
           <button
             onClick={() => handleInvestment(pack.id)}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-grab transition duration-300 ease-in-out"
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer transition duration-300 ease-in-out"
           >
             Invest Now
           </button>
           <button
             onClick={() => router.push("/dashboard")}
-            className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg cursor-grab transition duration-300 ease-in-out"
+            className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg cursor-pointer transition duration-300 ease-in-out"
           >
             Back to Dashboard
           </button>

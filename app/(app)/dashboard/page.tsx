@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { auth } from "../../../firebase";
-import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import AnimatedLink from "@/components/AnimatedLink";
 import Loading from "@/components/Loading";
+import Navbar from "@/components/Navbar";
 
 interface Pack {
   id: string;
@@ -24,7 +24,6 @@ export default function Dashboard() {
   const [packs, setPacks] = useState<Pack[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
-  const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -144,43 +143,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      {user && (
-        <div
-          className="flex justify-between items-center bg-amber-100 px-8 py-4 rounded-br-3xl"
-          id="navbar"
-        >
-          <div className="flex justify-center items-center gap-2">
-            <Menu
-              className="inline-block mr-4 cursor-pointer"
-              onClick={() => setOpen(!open)}
-            />
-            {open && (
-              <div className="absolute top-16 left-0 w-auto bg-amber-100 text-black rounded-br-3xl flex flex-col items-center gap-4 p-5">
-                <a href="/profile">Profile</a>
-              </div>
-            )}
-            <h1 className="text-2xl font-bold font-serif ">₹ Dhanify ₹</h1>
-          </div>
-          <div className="flex justify-center items-center gap-4 font-serif font-semibold">
-            <Image
-              src={user.photoURL || "/default-profile-img.png"}
-              alt="Profile Image"
-              width={30}
-              height={30}
-              className="rounded-full"
-            />
-            <p>{user.displayName}</p>
-            <button
-              onClick={async () => {
-                await auth.signOut();
-                router.push("/");
-              }}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      )}
       <div className="p-10">
         {stats &&
           (() => {
@@ -242,7 +204,7 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600 mt-2">{pack.description}</p>
               <button
                 onClick={() => handleInvestment(pack.id)}
-                className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-grab transition duration-300 ease-in-out"
+                className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer transition duration-300 ease-in-out"
               >
                 Invest Now
               </button>
