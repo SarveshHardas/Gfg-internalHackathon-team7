@@ -7,6 +7,7 @@ import ThreeDPieChart from "@/components/ThreeDPieChart";
 import toast from "react-hot-toast";
 import Loading from "@/components/Loading";
 import { fireConfetti } from "@/app/lib/confetti";
+import InvestmentModal from "@/components/InvestedModal";
 
 type ChartItem = {
   name: string;
@@ -23,6 +24,8 @@ export default function PackagePage() {
   const [user, setUser] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [userInvestment, setUserInvestment] = useState<number>(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPack, setSelectedPack] = useState<any>(null);
 
   useEffect(() => {
     const unsubs = auth.onAuthStateChanged((currentUser) => {
@@ -68,13 +71,12 @@ export default function PackagePage() {
     fetchUserPackInvestment();
   }, [user, id]);
 
-  const handleInvestment = async (packId: string) => {
-    // for handling investment
+  const handleInvestment = async (packId: string, amount: number) => {
     try {
       const user = auth.currentUser;
 
       if (!user) {
-        toast.success("User not logged in.");
+        toast.error("User not logged in.");
         return;
       }
 
@@ -86,6 +88,7 @@ export default function PackagePage() {
         body: JSON.stringify({
           userId: user.uid,
           packId,
+          amount,
         }),
       });
 
@@ -173,8 +176,11 @@ export default function PackagePage() {
 
         <div className="flex justify-center items-center mt-10 gap-10">
           <button
-            onClick={() => handleInvestment(pack.id)}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer transition duration-300 ease-in-out"
+            onClick={() => {
+              setSelectedPack(pack);
+              setModalOpen(true);
+            }}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
           >
             Invest Now
           </button>
@@ -186,6 +192,15 @@ export default function PackagePage() {
           </button>
         </div>
       </div>
+      <InvestmentModal
+        isOpen={modalOpen}
+        minAmount={selectedPack?.amount}
+        onClose={() => setModalOpen(false)}
+        onConfirm={(amount: number) => {
+          setModalOpen(false);
+          handleInvestment(selectedPack.id, amount);
+        }}
+      />
     </div>
   );
 }

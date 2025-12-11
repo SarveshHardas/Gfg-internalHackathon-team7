@@ -25,7 +25,7 @@ export default function Navbar() {
           id="navbar"
         >
           <div className="flex justify-center items-center gap-2">
-            <h1 className="text-2xl font-bold font-serif ml-7">₹ Dhanify ₹</h1>
+            <h1 className="text-3xl font-extrabold ml-7 font-[Bradlens] tracking-wider">₹ Dhanify ₹</h1>
           </div>
           <div className="flex justify-center items-center gap-4 font-serif font-semibold">
             <Image
