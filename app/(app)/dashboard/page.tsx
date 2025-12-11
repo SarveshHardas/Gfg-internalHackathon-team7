@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { auth } from "../../../firebase";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import AnimatedLink from "@/components/AnimatedLink";
 import Loading from "@/components/Loading";
 import { fireConfetti } from "@/app/lib/confetti";
 import MiniInvestmentGraph from "@/components/MiniInvestmentGraph";
-import { gsap } from "gsap";
+import StreakBar from "@/components/StreakBar";
+import { getInvestmentDates } from "../../lib/investmentDates";
+import InvestmentCalendar from "../../../components/InvestmentCalendar";
+import InvestmentModal from "@/components/InvestedModal";
 
 interface Pack {
   id: string;
@@ -20,8 +22,6 @@ interface Pack {
 }
 
 export default function Dashboard() {
-  const router = useRouter();
-
   const [packs, setPacks] = useState<Pack[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
@@ -29,6 +29,9 @@ export default function Dashboard() {
   const [graphData, setGraphData] = useState<{ value: number }[]>([
     { value: 0 },
   ]);
+  const [investmentDates, setInvestmentDates] = useState<string[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPack, setSelectedPack] = useState<any>(null);
 
   useEffect(() => {
     if (!stats?.totalInvested) return;
@@ -37,7 +40,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-      // for auth state change
       setUser(currentUser);
 
       if (!currentUser) {
@@ -58,7 +60,6 @@ export default function Dashboard() {
     });
 
     const fetchPacks = async () => {
-      // for fetching pack details
       try {
         const res = await fetch("/api/packs");
         const data = await res.json();
@@ -95,13 +96,21 @@ export default function Dashboard() {
     return () => unsubscribe();
   }, []);
 
-  // Show loading state while fetching packs
+  useEffect(() => {
+    const fetchDates = async () => {
+      if (!user) return;
+      const dates = await getInvestmentDates(user.uid);
+      setInvestmentDates(dates);
+    };
+
+    fetchDates();
+  }, [user]);
+
   if (loading) {
     return <Loading />;
   }
 
-  const handleInvestment = async (packId: string) => {
-    // for handling investment
+  const handleInvestment = async (packId: string, amount: number) => {
     try {
       const user = auth.currentUser;
 
@@ -118,6 +127,7 @@ export default function Dashboard() {
         body: JSON.stringify({
           userId: user.uid,
           packId,
+          amount,
         }),
       });
 
@@ -188,31 +198,51 @@ export default function Dashboard() {
 
         {stats && (
           <div className="flex justify-center items-center">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-6">
+            <div className="grid grid-cols-1 grid-rows-2 md:grid-cols-2 gap-10 mb-6">
               <div
                 id="total-investment-badge"
-                className="px-6 py-3 rounded-xl font-bold text-black"
+                className="backdrop-blur-xl 
+                bg-[rgba(248,113,113,0.5)] 
+                border border-white/20 
+                rounded-2xl 
+                p-6 
+                shadow-2xl 
+                text-black 
+                font-bold font-[Bradlens] text-lg"
               >
-                💸 Total Investment: ₹{stats.totalInvested}
+                <p className="mb-3">
+                  💸 Total Investment: ₹{stats.totalInvested}
+                </p>
                 <MiniInvestmentGraph data={graphData} />
+              </div>
+              <div className="px-6 py-3 rounded-xl font-bold text-black row-span-2 font-[Bradlens] tracking-wider bg-blue-300">
+                <p className="mb-5 font-bold text-lg text-center">
+                  📅 Last invested on:{" "}
+                  {stats.lastInvestedOn
+                    ? new Date(stats.lastInvestedOn).toLocaleDateString()
+                    : "Not Yet"}
+                </p>
+                <InvestmentCalendar investmentDates={investmentDates} />
               </div>
 
               <div
                 id="streak-badge"
-                className="px-6 py-3 rounded-xl font-bold text-black"
+                className="flex justify-between items-center-safe backdrop-blur-3xl bg-[rgba(16,185,129,0.35)] border- border-white/20 rounded-2xl p-6 shadw-2xl"
               >
-                ❤️‍🔥 Streak: {stats.streak} {stats.streak > 1 ? "days" : "day"}
-              </div>
-              <div className="px-6 py-3 rounded-xl font-bold text-black">
-                📅 Last invested on:{" "}
-                {stats.lastInvestedOn
-                  ? new Date(stats.lastInvestedOn).toLocaleDateString()
-                  : "Not Yet"}
+                <div className="h-full">
+                  <p className="font-bold font-[Bradlens] text-lg">
+                    ❤️‍🔥 Streak: {stats.streak}{" "}
+                    {stats.streak > 1 ? "days" : "day"}
+                  </p>
+                </div>
+                <StreakBar streak={stats.streak} />
               </div>
             </div>
           </div>
         )}
-        <h1 className="text-3xl font-bold mb-6">Investment Package</h1>
+        <h1 className="text-3xl mb-6 font-roboto font-bold">
+          Investment Package
+        </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {packs.map((pack) => (
             <div
@@ -232,14 +262,26 @@ export default function Dashboard() {
               <p>Risk: {pack.risk}</p>
               <p className="text-sm text-gray-600 mt-2">{pack.description}</p>
               <button
-                onClick={() => handleInvestment(pack.id)}
-                className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer transition duration-300 ease-in-out"
+                onClick={() => {
+                  setSelectedPack(pack);
+                  setModalOpen(true);
+                }}
+                className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
               >
                 Invest Now
               </button>
               <AnimatedLink href={`/package/${pack.id}`}>
                 <h2 className="text-xl font-semibold">Read More</h2>
               </AnimatedLink>
+              <InvestmentModal
+                isOpen={modalOpen}
+                minAmount={selectedPack?.amount}
+                onClose={() => setModalOpen(false)}
+                onConfirm={(amount: number) => {
+                  setModalOpen(false);
+                  handleInvestment(selectedPack.id, amount);
+                }}
+              />
             </div>
           ))}
         </div>
