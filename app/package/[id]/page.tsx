@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { auth } from "../../../firebase";
 import ThreeDPieChart from "@/components/ThreeDPieChart";
+import toast from "react-hot-toast";
+import Loading from "@/components/Loading";
+import { fireConfetti } from "@/app/lib/confetti";
+import InvestmentModal from "@/components/InvestedModal";
 
 type ChartItem = {
   name: string;
@@ -20,6 +24,8 @@ export default function PackagePage() {
   const [user, setUser] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [userInvestment, setUserInvestment] = useState<number>(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPack, setSelectedPack] = useState<any>(null);
 
   useEffect(() => {
     const unsubs = auth.onAuthStateChanged((currentUser) => {
@@ -65,13 +71,12 @@ export default function PackagePage() {
     fetchUserPackInvestment();
   }, [user, id]);
 
-  const handleInvestment = async (packId: string) => {
-    // for handling investment
+  const handleInvestment = async (packId: string, amount: number) => {
     try {
       const user = auth.currentUser;
 
       if (!user) {
-        alert("User not logged in.");
+        toast.error("User not logged in.");
         return;
       }
 
@@ -83,15 +88,18 @@ export default function PackagePage() {
         body: JSON.stringify({
           userId: user.uid,
           packId,
+          amount,
         }),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        alert(
+        toast.success(
           `Investment successful!\nYou invested: ₹${data.investedAmount}\nExpected Return: ₹${data.expectedReturn}`
         );
+
+        fireConfetti();
 
         const res = await fetch("/api/user", {
           method: "POST",
@@ -106,11 +114,11 @@ export default function PackagePage() {
           setStats(updatedData.user);
         }
       } else {
-        alert("Investment failed!!" + data.message);
+        toast.error("Investment failed!!" + data.message);
       }
     } catch (err: any) {
       console.error("Investment error:", err);
-      alert("Something went wrong while investing.");
+      toast.error("Something went wrong while investing.");
     }
   };
 
@@ -122,7 +130,7 @@ export default function PackagePage() {
     }));
 
   if (loading) {
-    return <div className="p-10">Loading package...</div>;
+    return <Loading />;
   }
   if (!pack) {
     return <div className="p-10">Package data not found</div>;
@@ -130,7 +138,7 @@ export default function PackagePage() {
 
   return (
     <div className="p-10 flex flex-col justify-center items-center gap-7 min-h-screen">
-      <div className="border-2 border-black p-14 rounded-3xl">
+      <div className="z-50 shadow-2xl p-14 rounded-3xl">
         <h1 className="text-3xl font-bold mb-4">{pack.name}</h1>
         <h1 className="mb-4">💸 Amount: ₹{pack.amount}</h1>
         <h1 className="mb-4">📈 APY: {pack.apy}%</h1>
@@ -166,22 +174,33 @@ export default function PackagePage() {
           </div>
         )}
 
-        <button
-          onClick={() => handleInvestment(pack.id)}
-          className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-grab transition duration-300 ease-in-out"
-        >
-          Invest Now
-        </button>
-
-        <div className="flex justify-center items-center mt-10">
+        <div className="flex justify-center items-center mt-10 gap-10">
+          <button
+            onClick={() => {
+              setSelectedPack(pack);
+              setModalOpen(true);
+            }}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          >
+            Invest Now
+          </button>
           <button
             onClick={() => router.push("/dashboard")}
-            className="bg-amber-500 text-white px-4 py-2 rounded"
+            className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg cursor-pointer transition duration-300 ease-in-out"
           >
             Back to Dashboard
           </button>
         </div>
       </div>
+      <InvestmentModal
+        isOpen={modalOpen}
+        minAmount={selectedPack?.amount}
+        onClose={() => setModalOpen(false)}
+        onConfirm={(amount: number) => {
+          setModalOpen(false);
+          handleInvestment(selectedPack.id, amount);
+        }}
+      />
     </div>
   );
 }
