@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Home, User } from "lucide-react";
+import { Home, User, Goal } from "lucide-react";
 
 
 export default function BottomNavbar() {
@@ -10,6 +10,7 @@ export default function BottomNavbar() {
 
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: <Home /> },
+    { name: "Goal", path:"/goal", icon: <Goal/> },
     { name: "Profile", path: "/profile", icon: <User /> },
   ];
 

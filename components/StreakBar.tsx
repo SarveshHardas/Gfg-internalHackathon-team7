@@ -3,7 +3,7 @@ interface StreakBarProps {
 }
 
 const StreakBar = ({ streak }: StreakBarProps) => {
-  const filled = streak % 8 + 1;
+  const filled = Math.max(7, streak)
   const total = 7;
 
   return (
