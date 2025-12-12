@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 
+interface InvestmentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (amount: number) => void;
+  minAmount: number;
+} 
+
 export default function InvestmentModal({
   isOpen,
   onClose,
   onConfirm,
   minAmount,
-}) {
+}: InvestmentModalProps) {
   const [amount, setAmount] = useState(minAmount);
 
   if (!isOpen) return null;
@@ -34,7 +41,9 @@ export default function InvestmentModal({
       className="fixed inset-0 bg-black/2 backdrop-blur-sm flex justify-center items-center z-[9999]"
     >
       <div className="backdrop-blur-xl bg-white/20 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.15)] rounded-2xl p-6 w-full max-w-md transform transition-all duration-300">
-        <h2 className="text-xl font-semibold mb-4 text-black/60">Enter Investment Amount</h2>
+        <h2 className="text-xl font-semibold mb-4 text-black/60">
+          Enter Investment Amount
+        </h2>
         <input
           type="number"
           value={amount}

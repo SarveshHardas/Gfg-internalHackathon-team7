@@ -1,5 +1,9 @@
-const StreakBar = ({ streak }) => {
-  const filled = streak % 7;
+interface StreakBarProps {
+  streak: number;
+}
+
+const StreakBar = ({ streak }: StreakBarProps) => {
+  const filled = streak % 8 + 1;
   const total = 7;
 
   return (

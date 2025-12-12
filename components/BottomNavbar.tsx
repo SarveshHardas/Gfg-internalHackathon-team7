@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Home, User } from "lucide-react";
 
+
 export default function BottomNavbar() {
   const pathname = usePathname();
   const router = useRouter();
