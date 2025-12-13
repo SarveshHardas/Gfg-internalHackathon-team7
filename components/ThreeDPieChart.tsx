@@ -12,7 +12,7 @@ interface PieData {
 
 interface ThreeDPieChartProps {
   data: PieData[];
-  totalInvestment: number; // ✅ NEW
+  totalInvestment: number;
 }
 
 const COLORS = ["#22c55e", "#0ea5e9", "#f59e0b", "#6366f1", "#ec4899"];
