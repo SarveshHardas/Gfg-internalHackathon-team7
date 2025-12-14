@@ -10,6 +10,7 @@ import {db} from "../firebase";
 import toast from "react-hot-toast";
 import localFont from "next/font/local";
 import {Phone} from 'lucide-react';
+import Link from "next/link";
 
 const bradlens = localFont({
     src: "../public/fonts/bradlens.otf",
@@ -66,12 +67,14 @@ const LoginPage = () => {
                         ₹ Dhanify ₹
                     </h2>
                     <div className={"flex flex-col justify-center items-center gap-3 font-roboto"}>
-                        <button
-                            className="flex justify-center items-center gap-5 border-2 border-black rounded-lg bg-gray-100 p-2 mt-5 hover:bg-gray-200 hover:scale-105 transition-transform duration-200"
-                        >
-                            <Phone/>
-                            <p>Log in with Mobile number</p>
-                        </button>
+                        <Link href={"/WorkinProgress"}>
+                            <button
+                                className="flex justify-center items-center gap-5 border-2 border-black rounded-lg bg-gray-100 p-2 mt-5 hover:bg-gray-200 hover:scale-105 transition-transform duration-200"
+                            >
+                                <Phone/>
+                                <p>Log in with Mobile number</p>
+                            </button>
+                        </Link>
                         <div className="flex items-center gap-4">
                             <div className="flex-1 border-t border-dashed border-gray-300"/>
                             <span>OR</span>
