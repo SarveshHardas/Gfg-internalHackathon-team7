@@ -67,7 +67,7 @@ const LoginPage = () => {
                         ₹ Dhanify ₹
                     </h2>
                     <div className={"flex flex-col justify-center items-center gap-3 font-roboto"}>
-                        <Link href={"/WorkinProgress"}>
+                        <Link href={"/MobileLogin"}>
                             <button
                                 className="flex justify-center items-center gap-5 border-2 border-black rounded-lg bg-gray-100 p-2 mt-5 hover:bg-gray-200 hover:scale-105 transition-transform duration-200"
                             >
